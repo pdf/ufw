@@ -29,8 +29,12 @@ def run_list_names(run_list)
       names.push(entry.name)
     end
     if entry.role?
-      rol = search(:role, "name:#{entry.name}")[0]
-      names.concat(run_list_names(rol.run_list))
+      if Chef::Config[:solo]
+        Chef::Log.warn("This recipe uses search. Chef Solo does not support search.")
+      else
+        rol = search(:role, "name:#{entry.name}")[0]
+        names.concat(run_list_names(rol.run_list))
+      end
     end
   end
   Chef::Log.debug "ufw::databag:run_list_names+names: #{names}"
